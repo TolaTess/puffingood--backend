@@ -63,6 +63,23 @@ app.post('/create-payment-intent', async (req, res) => {
   }
 });
 
+app.post('/refund-payment', async (req, res) => {
+  try {
+    const { paymentIntentId, orderId } = req.body;
+    
+    // Process refund through Stripe
+    const refund = await stripe.refunds.create({
+      payment_intent: paymentIntentId,
+      reason: 'requested_by_customer'
+    });
+
+    res.json({ refundId: refund.id });
+  } catch (error) {
+    console.error('Error processing refund:', error);
+    res.status(500).json({ error: 'Failed to process refund' });
+  }
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
